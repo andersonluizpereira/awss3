@@ -1,3 +1,11 @@
+terraform {
+  required_version = ">=0.13.1"
+  required_providers {
+    aws   = ">=3.54.0"
+    local = ">=2.1.0"
+  }
+}
+
 provider "aws" {
   region                      = "us-east-1"
   access_key                  = "$(var.access_key)"
@@ -9,18 +17,15 @@ provider "aws" {
   endpoints {
     s3 = "http://localhost:4566"
   }
+  default_tags {
+    tags = {
+      Environment = "Development"
+      Owner       = "Ops"
+      Product     = "E-Commerce"
+    }
+  }
 }
 
-# Create Bucket
-resource "aws_s3_bucket" "b" {
-  bucket = "mybucket"
-  acl    = "public-read"
-}
-
-# Upload an object
-resource "aws_s3_bucket_object" "object" {
-  bucket = aws_s3_bucket.b.id
-  key    = "test.txt"
-  acl    = "public-read"
-  source = "test.txt"
+module "s3" {
+  source   = "./modules/s3"
 }
